@@ -55,3 +55,25 @@ def salvar_registro(evento, alerta_disparado, mensagem):
     
     conexao.commit()
     conexao.close()
+
+
+def buscar_historico():
+    """
+    Busca todos os registros salvos na tabela de eventos, 
+    do mais recente para o mais antigo.
+    """
+    conexao = sqlite3.connect(NOME_BANCO)
+    
+    # Isso faz o SQLite retornar os dados como um dicionário (chave e valor)
+    # em vez de apenas uma tupla de números soltos.
+    conexao.row_factory = sqlite3.Row 
+    cursor = conexao.cursor()
+    
+    # Pega tudo, ordenando pelo ID do maior (mais novo) para o menor (mais velho)
+    cursor.execute('SELECT * FROM eventos ORDER BY id DESC')
+    linhas = cursor.fetchall()
+    
+    conexao.close()
+    
+    # Converte as linhas do banco de dados em uma lista de dicionários
+    return [dict(linha) for linha in linhas]

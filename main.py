@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Union, Optional
+from database import criar_banco_e_tabela, salvar_registro, buscar_historico
 
 # 1. Importando as funções do nosso arquivo de banco de dados
 from database import criar_banco_e_tabela, salvar_registro
@@ -53,6 +54,16 @@ def processar_regras(evento: EventoSensor):
 @app.get("/")
 def raiz():
     return {"status": "online", "mensagem": "NotificationHub operando na porta 9000!"}
+
+# Nova rota para visualizar o histórico
+@app.get("/api/eventos")
+def listar_eventos():
+    historico = buscar_historico()
+    return {
+        "status": "sucesso",
+        "total_registros": len(historico),
+        "dados": historico
+    }
 
 # A Rota Atualizada
 @app.post("/api/eventos")
