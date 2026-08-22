@@ -2,13 +2,19 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Union, Optional
 
+# 1. Importando as funções do nosso arquivo de banco de dados
+from database import criar_banco_e_tabela, salvar_registro
+
 app = FastAPI(
     title="NotificationHub - Fazenda Inteligente",
     description="MVP de monitoramento e alertas em tempo real",
     version="1.0.0"
 )
 
-# 1. O Molde de Validação
+# 2. Cria o banco de dados e a tabela assim que o servidor iniciar
+criar_banco_e_tabela()
+
+# O Molde de Validação
 class EventoSensor(BaseModel):
     eventId: str
     farmId: str
@@ -18,7 +24,7 @@ class EventoSensor(BaseModel):
     unit: Optional[str] = None
     timestamp: str
 
-# 2. O Motor de Regras (O "Juiz")
+# O Motor de Regras (O "Juiz")
 def processar_regras(evento: EventoSensor):
     alerta = False
     mensagem = ""
@@ -44,11 +50,18 @@ def processar_regras(evento: EventoSensor):
 
     return alerta, mensagem
 
-# 3. A Rota Atualizada
+@app.get("/")
+def raiz():
+    return {"status": "online", "mensagem": "NotificationHub operando na porta 9000!"}
+
+# A Rota Atualizada
 @app.post("/api/eventos")
 def receber_evento(evento: EventoSensor):
-    # Passa o dado recebido para o Motor de Regras
+    # Passo A: Passa o dado recebido para o Motor de Regras
     gerou_alerta, mensagem_alerta = processar_regras(evento)
+    
+    # Passo B: Salva o histórico definitivo no banco de dados SQLite
+    salvar_registro(evento, gerou_alerta, mensagem_alerta)
     
     return {
         "status": "sucesso",
