@@ -3,7 +3,7 @@ import time
 import requests
 
 # A URL da nossa API
-URL_API = "http://127.0.0.0:9000/api/eventos"
+URL_API = "http://127.0.0.1:9000/api/eventos"
 # Nome do nosso arquivo com os dados
 ARQUIVO_DADOS = "dados_demonstracao.json"
 
