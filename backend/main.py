@@ -1,18 +1,27 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Union, Optional
 from database import criar_banco_e_tabela, salvar_registro, buscar_historico
 
-# 1. Importando as funções do nosso arquivo de banco de dados
-from database import criar_banco_e_tabela, salvar_registro
-
+# Instancia o FastAPI com o root_path correto
 app = FastAPI(
     title="NotificationHub - Fazenda Inteligente",
     description="MVP de monitoramento e alertas em tempo real",
-    version="1.0.0"
+    version="1.0.0",
+    root_path="/api-agro"
 )
 
-# 2. Cria o banco de dados e a tabela assim que o servidor iniciar
+# Configuração do CORS para permitir que o React acesse a API sem bloqueios
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permite requisições de qualquer origem
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos os métodos (GET, POST, etc.)
+    allow_headers=["*"],  # Permite todos os cabeçalhos
+)
+
+# Cria o banco de dados e a tabela assim que o servidor iniciar
 criar_banco_e_tabela()
 
 # O Molde de Validação
@@ -55,7 +64,7 @@ def processar_regras(evento: EventoSensor):
 def raiz():
     return {"status": "online", "mensagem": "NotificationHub operando na porta 9000!"}
 
-# Nova rota para visualizar o histórico
+# Rota de histórico ajustada para /api/eventos
 @app.get("/api/eventos")
 def listar_eventos():
     historico = buscar_historico()
@@ -65,13 +74,11 @@ def listar_eventos():
         "dados": historico
     }
 
-# A Rota Atualizada
+# Rota para receber eventos ajustada para /api/eventos
 @app.post("/api/eventos")
 def receber_evento(evento: EventoSensor):
-    # Passo A: Passa o dado recebido para o Motor de Regras
     gerou_alerta, mensagem_alerta = processar_regras(evento)
     
-    # Passo B: Salva o histórico definitivo no banco de dados SQLite
     salvar_registro(evento, gerou_alerta, mensagem_alerta)
     
     return {
