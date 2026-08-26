@@ -53,3 +53,42 @@ Este documento descreve a arquitetura, os pré-requisitos e os passos para rodar
 │   └── ...
 ├── .gitignore             # Arquivos ignorados pelo Git (.venv, .env, node_modules)
 └── DEVELOPMENT.md         # Este arquivo de documentação
+
+
+
+
+########################   COM REACT JA CONFIGURADO E FUNCIONANDO
+
+
+## [2026-08-26] - Integração do Front-End (React/Vite) e Proxy Reverso (Nginx)
+
+### 🚀 O que foi feito:
+1. **Desenvolvimento e Build do Front-End:**
+   - Criação de uma interface web moderna em **React (Vite)** para monitoramento em tempo real dos 6 sensores oficiais da fazenda inteligente ("Fazenda Boa Vista").
+   - Implementação da seção de **Sensores Ativos** com cartões dinâmicos, indicadores de status (*Ideal* vs *Crítico*) e formatação de nomes amigáveis para leigos (substituindo os IDs técnicos como `sensor-temp-01` por nomes limpos como *Temperatura do Ar*).
+   - Inclusão de um **Simulador Interativo via Web (POST)** blindado com um menu suspenso (`select`) oficial dos sensores e mensagens de notificação automáticas e vinculadas.
+
+2. **Configuração de Infraestrutura e Proxy Reverso (Nginx):**
+   - Configuração do Nginx para servir a build estática (`dist`) do painel React na subrota pública **`/api-agro2`**.
+   - Ajuste do arquivo `vite.config.js` com a propriedade `base: '/api-agro2/'` para garantir o mapeamento correto dos assets estáticos.
+   - Manutenção da rota de redirecionamento do Back-End FastAPI na porta `9000` (`/api-agro/`) para processamento dos dados e histórico no banco SQLite.
+
+3. **Correção de Fluxo e Validação da API:**
+   - Alinhamento do payload do Front-End para corresponder estritamente ao esquema exigido pelo Pydantic/FastAPI (`eventId`, `deviceId`, `type`, `value`, `unit`, `timestamp`).
+   - Resolução bem-sucedida de requisições `POST` de simulação de eventos gravando diretamente no banco de dados e atualizando o painel instantaneamente.
+
+---
+
+## 📂 Estrutura do Projeto
+
+* `main.py`: Ponto de entrada da API (FastAPI), contendo o Motor de Regras e rotas.
+* `database.py`: Gerenciador de conexão e queries do SQLite.
+* `simulador.py`: Script de automação via terminal para testes de carga em Python.
+* `dados_demonstracao.json`: Massa de dados inicial para simulação dos sensores.
+* `frontend/`: Código fonte completo e arquivos da interface em React (Vite).
+  * `src/App.jsx`: Componente principal do painel, cards e simulador web.
+  * `dist/`: Pasta contendo a build estática de produção servida pelo Nginx.
+  * `vite.config.js`: Configurações de build e roteamento base do front-end.
+* `requirements.txt`: Dependências do ambiente Python da API.
+* `README.md`: Documentação geral da plataforma.
+* `DEVELOPMENT_LOG.md`: Diário de bordo detalhando a evolução arquitetural e uso de IA.
