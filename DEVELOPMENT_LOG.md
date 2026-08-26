@@ -78,17 +78,17 @@ Este documento descreve a arquitetura, os pré-requisitos e os passos para rodar
    - Resolução bem-sucedida de requisições `POST` de simulação de eventos gravando diretamente no banco de dados e atualizando o painel instantaneamente.
 
 ---
-
 ## 📂 Estrutura do Projeto
 
-* `main.py`: Ponto de entrada da API (FastAPI), contendo o Motor de Regras e rotas.
-* `database.py`: Gerenciador de conexão e queries do SQLite.
-* `simulador.py`: Script de automação via terminal para testes de carga em Python.
-* `dados_demonstracao.json`: Massa de dados inicial para simulação dos sensores.
-* `frontend/`: Código fonte completo e arquivos da interface em React (Vite).
-  * `src/App.jsx`: Componente principal do painel, cards e simulador web.
-  * `dist/`: Pasta contendo a build estática de produção servida pelo Nginx.
-  * `vite.config.js`: Configurações de build e roteamento base do front-end.
-* `requirements.txt`: Dependências do ambiente Python da API.
-* `README.md`: Documentação geral da plataforma.
-* `DEVELOPMENT_LOG.md`: Diário de bordo detalhando a evolução arquitetural e uso de IA.
+```text
+├── backend/               # Código do servidor FastAPI e banco SQLite
+│   ├── main.py            # API REST, rotas e regras de negócio
+│   ├── database.py        # Configuração do banco de dados
+│   └── requirements.txt   # Dependências Python
+├── frontend/              # Código fonte e build da interface React (Vite)
+│   ├── src/               # Componentes e arquivos de tela (App.jsx)
+│   ├── dist/              # Arquivos estáticos gerados para o Nginx
+│   └── vite.config.js     # Configurações do Vite
+├── README.md              # Documentação principal da plataforma
+└── DEVELOPMENT_LOG.md     # Diário de bordo da evolução do MVP
+
