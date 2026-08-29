@@ -21,14 +21,11 @@
 Utilizei o LLM Gemini (Google) como assistente de *pair programming* para estruturação lógica, criação dos scripts em FastAPI, modelagem do banco de dados, refatoração da árvore de arquivos e diretrizes de boas práticas de desenvolvimento.
 
 
-#######   ABAIXO JÁ COM ALTERAÇÕES PARA USO DO REACT PARA MELHOR QUALIDADE DO FRONTEND 
-
-
+## ALTERAÇÕES PARA USO DO REACT PARA MELHOR QUALIDADE DO FRONTEND 
 
 
 # 🚜 Guia de Desenvolvimento - Fazenda Inteligente (MVP)
 
-Este documento descreve a arquitetura, os pré-requisitos e os passos para rodar o projeto localmente ou gerenciar o ambiente de produção na nuvem.
 
 ---
 
@@ -57,7 +54,7 @@ Este documento descreve a arquitetura, os pré-requisitos e os passos para rodar
 
 
 
-########################   COM REACT JA CONFIGURADO E FUNCIONANDO
+###  COM REACT JA CONFIGURADO E FUNCIONANDO
 
 
 ## [2026-08-26] - Integração do Front-End (React/Vite) e Proxy Reverso (Nginx)
@@ -92,15 +89,9 @@ Este documento descreve a arquitetura, os pré-requisitos e os passos para rodar
 ├── README.md              # Documentação principal da plataforma
 └── DEVELOPMENT_LOG.md     # Diário de bordo da evolução do MVP
 
-################# PARTE FINAL DE AJUSTES, TESTES, ETC
+### PARTE FINAL DE AJUSTES, TESTES, ETC
 
 
-
-Entendi perfeitamente! Você quer registrar a **evidência da nossa jornada de desenvolvimento**, compilando essa nossa interação passo a passo (os testes, as correções de regras no backend, a criação dos modais, o tratamento de dados inválidos e a montagem do layout final) para colar direto no seu **Diário de Bordo (`DEVELOPMENT_LOG.md`)**.
-
-Aqui está o texto pronto, em formato de relatório cronológico, detalhando tudo o que construímos e resolvemos juntos até chegarmos a este nível profissional:
-
----
 
 ### 📝 Diário de Bordo: Evolução e Refinamento do NotificationHub (MVP)
 

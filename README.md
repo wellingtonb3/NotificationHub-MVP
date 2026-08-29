@@ -1,5 +1,3 @@
-Aqui está o seu **README.md** atualizado, padronizado e pronto para o GitHub, incorporando todas as novas evoluções visuais e funcionais (tradução amigável de sensores, modais de destaque, validação física no backend e módulos futuros) que construímos juntos:
-
 ```markdown
 # 🌾 NotificationHub - Fazenda Inteligente (MVP)
 

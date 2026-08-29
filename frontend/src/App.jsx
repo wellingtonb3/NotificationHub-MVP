@@ -11,6 +11,7 @@ function App() {
   const [mostrarModalSensores, setMostrarModalSensores] = useState(false);
   const [mostrarModalHistorico, setMostrarModalHistorico] = useState(false);
   const [mostrarModalAlertas, setMostrarModalAlertas] = useState(false);
+  const [mostrarModalWhatsApp, setMostrarModalWhatsApp] = useState(false); // Novo modal de mensageria
   
   const [menuAberto, setMenuAberto] = useState(false);
   
@@ -43,21 +44,20 @@ function App() {
     return nomesSensores[deviceId] || deviceId;
   };
 
-  const formatarValorComUnidade = (deviceId, leitura) => {
-    // Se for o atuador de status, retorna o texto puro (ex: FAILURE, READY)
-    if (deviceId === 'irrigation-pump-01') return leitura;
-    if (isNaN(leitura)) return leitura;
+  const formatarValorComUnidade = (deviceId, value) => {
+    if (deviceId === 'irrigation-pump-01') return value;
+    if (isNaN(value)) return value;
 
     switch (deviceId) {
       case 'sensor-temp-01':
-        return `${leitura} °C`;
+        return `${value} °C`;
       case 'sensor-humidity-01':
       case 'sensor-soil-01':
       case 'reservoir-sensor-01':
       case 'silo-sensor-01':
-        return `${leitura} %`;
+        return `${value} %`;
       default:
-        return leitura;
+        return value;
     }
   };
 
@@ -70,7 +70,6 @@ function App() {
     { nome: 'Bomba de Irrigação (Status)', deviceId: 'irrigation-pump-01', eventId: 'event-006', type: 'EQUIPMENT_STATUS', unidade: '', leituraPadrao: 'FAILURE' }
   ];
 
- 
   const [sensorSelecionadoIndex, setSensorSelecionadoIndex] = useState(2);
   const [simLeitura, setSimLeitura] = useState(sensoresOficiais[2].leituraPadrao);
 
@@ -128,15 +127,14 @@ function App() {
     }
 
     const payload = {
-      event_id: sensorAtual.eventId, // <-- Agora usa o ID padrão correto (ex: event-001, event-002...)
-      farm_id: "farm-001",
-      device_id: sensorAtual.deviceId,
-      sensor_type: sensorAtual.type,
-      leitura: isNaN(simLeitura) ? simLeitura : Number(simLeitura),
+      eventId: sensorAtual.eventId,
+      farmId: "farm-001",
+      deviceId: sensorAtual.deviceId,
+      type: sensorAtual.type,
+      value: isNaN(simLeitura) ? simLeitura : Number(simLeitura),
       unit: sensorAtual.unidade,
       timestamp: new Date().toISOString()
     };
-
 
     try {
       const resposta = await fetch('https://wcorporate.com.br/api-agro/api/eventos', {
@@ -160,8 +158,8 @@ function App() {
   };
 
   const ultimosPorSensor = Array.isArray(eventos) ? eventos.reduce((acc, evento) => {
-    if (!acc[evento.device_id] || new Date(evento.timestamp) > new Date(acc[evento.device_id].timestamp)) {
-      acc[evento.device_id] = evento;
+    if (!acc[evento.deviceId] || new Date(evento.timestamp) > new Date(acc[evento.deviceId].timestamp)) {
+      acc[evento.deviceId] = evento;
     }
     return acc;
   }, {}) : {};
@@ -195,8 +193,8 @@ function App() {
     <div className="app-container" style={{ display: 'flex', width: '100vw', height: '100vh', backgroundColor: '#0f172a', color: '#f8fafc', fontFamily: 'Inter, sans-serif', overflow: 'hidden' }}>
       
       {/* SIDEBAR */}
-      <aside className={`sidebar ${menuAberto ? 'open' : ''}`} style={{ width: '240px', backgroundColor: '#1e293b', borderRight: '1px solid #334155', display: 'flex', flexDirection: 'column', padding: '20px', flexShrink: 0, overflowY: 'auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
+      <aside className={`sidebar ${menuAberto ? 'open' : ''}`} style={{ width: '250px', backgroundColor: '#1e293b', borderRight: '1px solid #334155', display: 'flex', flexDirection: 'column', padding: '20px', flexShrink: 0, overflowY: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
           <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '8px' }}>
             🔔 NotificationHub
           </div>
@@ -206,6 +204,14 @@ function App() {
             </button>
           )}
         </div>
+
+        {/* Bloco de Dados do Produtor / Fazenda na Sidebar */}
+        <div style={{ backgroundColor: '#0f172a', padding: '10px', borderRadius: '6px', marginBottom: '15px', border: '1px solid #334155', fontSize: '11px' }}>
+          <div style={{ color: '#38bdf8', fontWeight: 'bold', marginBottom: '4px' }}>🌾 Boa Esperança</div>
+          <div style={{ color: '#cbd5e1' }}><strong>Produtor:</strong> João Silva</div>
+          <div style={{ color: '#94a3b8', fontSize: '10px' }}>ID: producer-001</div>
+          <div style={{ color: '#cbd5e1', marginTop: '4px' }}><strong>Tel:</strong> +55 35 99999-9999</div>
+        </div>
         
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
           <div onClick={() => setMenuAberto(false)} style={{ padding: '8px 12px', borderRadius: '6px', backgroundColor: '#0284c7', color: 'white', fontWeight: 'bold', fontSize: '13px', cursor: 'pointer' }}>📊 Visão Geral</div>
@@ -213,6 +219,11 @@ function App() {
           <div onClick={() => { setMenuAberto(false); setMostrarModalSensores(true); }} style={{ padding: '8px 12px', borderRadius: '6px', color: '#94a3b8', fontSize: '13px', cursor: 'pointer' }}>🌱 Sensores Ativos</div>
           <div onClick={() => { setMenuAberto(false); setMostrarModalHistorico(true); }} style={{ padding: '8px 12px', borderRadius: '6px', color: '#94a3b8', fontSize: '13px', cursor: 'pointer' }}>📄 Histórico Completo</div>
           <div onClick={() => { setMenuAberto(false); setMostrarModalAlertas(true); }} style={{ padding: '8px 12px', borderRadius: '6px', color: '#94a3b8', fontSize: '13px', cursor: 'pointer' }}>🚨 Alertas</div>
+          
+          {/* Novo Botão de Mensageria / WhatsApp */}
+          <div onClick={() => { setMenuAberto(false); setMostrarModalWhatsApp(true); }} style={{ padding: '8px 12px', borderRadius: '6px', color: '#10b981', fontSize: '13px', cursor: 'pointer', fontWeight: 'bold', backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+            📱 Mensageria (WhatsApp)
+          </div>
 
           <hr style={{ borderColor: '#334155', margin: '12px 0' }} />
           <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', marginBottom: '4px', letterSpacing: '0.5px' }}>Módulos Futuros</div>
@@ -256,12 +267,12 @@ function App() {
             </button>
             <img 
               src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=100&h=100&fit=crop" 
-              alt="Fazenda Boa Vista" 
+              alt="Fazenda Boa Esperança" 
               style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #38bdf8' }} 
             />
             <div>
-              <h1 style={{ margin: 0, fontSize: '20px', color: '#f8fafc' }}>Fazenda Boa Vista</h1>
-              <p style={{ margin: '2px 0 0 0', color: '#94a3b8', fontSize: '11px' }}>Painel de Monitoramento</p>
+              <h1 style={{ margin: 0, fontSize: '20px', color: '#f8fafc' }}>Fazenda Boa Esperança</h1>
+              <p style={{ margin: '2px 0 0 0', color: '#94a3b8', fontSize: '11px' }}>Painel de Monitoramento (farm-001)</p>
             </div>
           </div>
 
@@ -333,9 +344,7 @@ function App() {
           </div>
         )}
 
-        {/* --- MODAIS DE DESTAQUE PARA CADA MENU --- */}
-
-        {/* 1. MODAL CLIMA */}
+        {/* --- MODAIS --- */}
         {mostrarModalClima && (
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(15, 23, 42, 0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
             <div style={{ backgroundColor: '#1e293b', border: '1px solid #38bdf8', borderRadius: '12px', width: '100%', maxWidth: '500px', padding: '20px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)' }}>
@@ -356,7 +365,6 @@ function App() {
           </div>
         )}
 
-        {/* 2. MODAL SENSORES ATIVOS */}
         {mostrarModalSensores && (
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(15, 23, 42, 0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
             <div style={{ backgroundColor: '#1e293b', border: '1px solid #10b981', borderRadius: '12px', width: '100%', maxWidth: '700px', maxHeight: '80vh', display: 'flex', flexDirection: 'column', padding: '20px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)' }}>
@@ -370,12 +378,12 @@ function App() {
                   return (
                     <div key={index} style={{ backgroundColor: '#0f172a', borderRadius: '8px', padding: '12px', border: '1px solid #334155', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                        <span style={{ fontSize: '12px', color: '#38bdf8', fontWeight: 'bold' }}>{formatarNomeSensor(evento.device_id)}</span>
+                        <span style={{ fontSize: '12px', color: '#38bdf8', fontWeight: 'bold' }}>{formatarNomeSensor(evento.deviceId)}</span>
                         <span style={{ fontSize: '9px', padding: '2px 6px', borderRadius: '10px', backgroundColor: badge.bg, color: badge.cor, fontWeight: 'bold' }}>{badge.texto}</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '4px' }}>
                         <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#f8fafc' }}>
-                          {formatarValorComUnidade(evento.device_id, evento.leitura)}
+                          {formatarValorComUnidade(evento.deviceId, evento.value)}
                         </span>
                         <span style={{ fontSize: '9px', color: '#64748b' }}>{new Date(evento.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
@@ -390,7 +398,6 @@ function App() {
           </div>
         )}
 
-        {/* 3. MODAL HISTÓRICO COMPLETO */}
         {mostrarModalHistorico && (
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(15, 23, 42, 0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
             <div style={{ backgroundColor: '#1e293b', border: '1px solid #0284c7', borderRadius: '12px', width: '100%', maxWidth: '750px', maxHeight: '80vh', display: 'flex', flexDirection: 'column', padding: '20px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)' }}>
@@ -407,13 +414,13 @@ function App() {
                   return (
                     <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 8px', backgroundColor: '#0f172a', borderRadius: '6px', borderBottom: '1px solid #334155', fontSize: '12px' }}>
                       <div style={{ fontWeight: 'bold', color: '#38bdf8' }}>
-                        {formatarNomeSensor(hist.device_id)}
+                        {formatarNomeSensor(hist.deviceId)}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: corStatus, display: 'inline-block' }} title={textoStatus}></span>
                           <span style={{ fontWeight: 'bold', color: '#f8fafc', fontSize: '13px' }}>
-                            {formatarValorComUnidade(hist.device_id, hist.leitura)}
+                            {formatarValorComUnidade(hist.deviceId, hist.value)}
                           </span>
                         </div>
                         <span style={{ color: '#94a3b8', fontSize: '11px', minWidth: '130px', textAlign: 'right' }}>
@@ -431,7 +438,6 @@ function App() {
           </div>
         )}
 
-        {/* 4. MODAL ALERTAS */}
         {mostrarModalAlertas && (
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(15, 23, 42, 0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
             <div style={{ backgroundColor: '#1e293b', border: '1px solid #ef4444', borderRadius: '12px', width: '100%', maxWidth: '600px', maxHeight: '80vh', display: 'flex', flexDirection: 'column', padding: '20px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)' }}>
@@ -445,7 +451,7 @@ function App() {
                 ) : (
                   alertasAtivos.map((alerta, idx) => (
                     <div key={idx} style={{ backgroundColor: 'rgba(239, 68, 68, 0.08)', borderLeft: '4px solid #ef4444', padding: '12px', borderRadius: '6px' }}>
-                      <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#fca5a5' }}>{formatarNomeSensor(alerta.device_id)}</div>
+                      <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#fca5a5' }}>{formatarNomeSensor(alerta.deviceId)}</div>
                       <div style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '4px' }}>{alerta.mensagem_notificacao || 'Alerta disparado pelo sensor.'}</div>
                       <div style={{ fontSize: '10px', color: '#64748b', marginTop: '6px', textAlign: 'right' }}>{new Date(alerta.timestamp).toLocaleString('pt-BR')}</div>
                     </div>
@@ -455,6 +461,60 @@ function App() {
               <div style={{ marginTop: '15px', textAlign: 'right' }}>
                 <button onClick={() => setMostrarModalAlertas(false)} style={{ padding: '8px 16px', backgroundColor: '#334155', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>Fechar</button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL DE STATUS DO MOCK WHATSAPP / MENSAGERIA */}
+        {mostrarModalWhatsApp && (
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(15, 23, 42, 0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
+            <div style={{ backgroundColor: '#1e293b', border: '1px solid #10b981', borderRadius: '12px', width: '100%', maxWidth: '650px', maxHeight: '80vh', display: 'flex', flexDirection: 'column', padding: '20px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)' }}>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '1px solid #334155', paddingBottom: '10px' }}>
+                <h2 style={{ margin: 0, fontSize: '16px', color: '#10b981', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  📱 Provedor de Mensageria (MockWhatsAppProvider)
+                </h2>
+                <button onClick={() => setMostrarModalWhatsApp(false)} style={{ background: 'none', border: 'none', color: '#f8fafc', fontSize: '18px', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
+              </div>
+
+              <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '15px', backgroundColor: '#0f172a', padding: '10px', borderRadius: '6px', border: '1px solid #334155' }}>
+                ℹ️ Esta área exibe o ciclo de vida das notificações simuladas pelo sistema (<strong style={{ color: '#38bdf8' }}>PENDING</strong>, <strong style={{ color: '#10b981' }}>SENT</strong>, <strong style={{ color: '#ef4444' }}>FAILED</strong>), utilizando a abstração <code style={{ color: '#f43f5e' }}>NotificationProvider</code> exigida pelo MVP.
+              </div>
+
+              <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+                {alertasAtivos.length === 0 ? (
+                  <p style={{ fontSize: '13px', color: '#64748b', textAlign: 'center', margin: '30px 0' }}>Nenhuma mensagem na fila de mensageria.</p>
+                ) : (
+                  alertasAtivos.map((notif, idx) => {
+                    const statusAtual = notif.status_notificacao || 'SENT';
+                    const corStatus = statusAtual === 'SENT' ? '#10b981' : statusAtual === 'PENDING' ? '#f59e0b' : '#ef4444';
+
+                    return (
+                      <div key={idx} style={{ backgroundColor: '#0f172a', border: '1px solid #334155', padding: '12px', borderRadius: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#38bdf8' }}>
+                            {formatarNomeSensor(notif.deviceId)} (Destinatário: +55 35 99999-9999)
+                          </span>
+                          <span style={{ backgroundColor: `${corStatus}20`, color: corStatus, padding: '2px 8px', borderRadius: '12px', fontWeight: 'bold', fontSize: '10px', border: `1px solid ${corStatus}` }}>
+                            {statusAtual}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#cbd5e1', fontStyle: 'italic' }}>
+                          "{notif.mensagem_notificacao}"
+                        </div>
+                        <div style={{ fontSize: '10px', color: '#64748b', marginTop: '6px', textAlign: 'right' }}>
+                          Processado em: {new Date(notif.timestamp).toLocaleString('pt-BR')}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              <div style={{ marginTop: '20px', textAlign: 'right' }}>
+                <button onClick={() => setMostrarModalWhatsApp(false)} style={{ padding: '8px 16px', backgroundColor: '#334155', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>Fechar</button>
+              </div>
+
             </div>
           </div>
         )}
@@ -472,12 +532,12 @@ function App() {
                   return (
                     <div key={index} style={{ backgroundColor: '#1e293b', borderRadius: '8px', padding: '12px', border: '1px solid #334155', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                        <span style={{ fontSize: '12px', color: '#38bdf8', fontWeight: 'bold' }}>{formatarNomeSensor(evento.device_id)}</span>
+                        <span style={{ fontSize: '12px', color: '#38bdf8', fontWeight: 'bold' }}>{formatarNomeSensor(evento.deviceId)}</span>
                         <span style={{ fontSize: '9px', padding: '2px 6px', borderRadius: '10px', backgroundColor: badge.bg, color: badge.cor, fontWeight: 'bold' }}>{badge.texto}</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '4px' }}>
                         <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#f8fafc' }}>
-                          {formatarValorComUnidade(evento.device_id, evento.leitura)}
+                          {formatarValorComUnidade(evento.deviceId, evento.value)}
                         </span>
                         <span style={{ fontSize: '9px', color: '#64748b' }}>{new Date(evento.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
@@ -487,7 +547,7 @@ function App() {
               </div>
             </div>
 
-            {/* HISTÓRICO DA TELA PRINCIPAL (Últimas 20) */}
+            {/* HISTÓRICO DA TELA PRINCIPAL */}
             <div style={{ backgroundColor: '#1e293b', borderRadius: '8px', padding: '14px', border: '1px solid #334155' }}>
               <h3 style={{ fontSize: '14px', color: '#cbd5e1', margin: '0 0 10px 0' }}>📄 Histórico de Leitura dos Sensores (Últimas 20 Leituras)</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '350px', overflowY: 'auto' }}>
@@ -499,13 +559,13 @@ function App() {
                   return (
                     <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 4px', borderBottom: '1px solid #334155', fontSize: '12px' }}>
                       <div style={{ fontWeight: 'bold', color: '#38bdf8' }}>
-                        {formatarNomeSensor(hist.device_id)}
+                        {formatarNomeSensor(hist.deviceId)}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: corStatus, display: 'inline-block' }} title={textoStatus}></span>
                           <span style={{ fontWeight: 'bold', color: '#f8fafc', fontSize: '13px' }}>
-                            {formatarValorComUnidade(hist.device_id, hist.leitura)}
+                            {formatarValorComUnidade(hist.deviceId, hist.value)}
                           </span>
                         </div>
                         <span style={{ color: '#94a3b8', fontSize: '11px', minWidth: '115px', textAlign: 'right' }}>
@@ -528,7 +588,7 @@ function App() {
               ) : (
                 alertasAtivos.map((alerta, idx) => (
                   <div key={idx} style={{ backgroundColor: 'rgba(239, 68, 68, 0.08)', borderLeft: '3px solid #ef4444', padding: '8px', borderRadius: '4px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#fca5a5' }}>{formatarNomeSensor(alerta.device_id)}</div>
+                    <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#fca5a5' }}>{formatarNomeSensor(alerta.deviceId)}</div>
                     <div style={{ fontSize: '11px', color: '#cbd5e1', marginTop: '2px' }}>{alerta.mensagem_notificacao || 'Alerta disparado pelo sensor.'}</div>
                     <div style={{ fontSize: '9px', color: '#64748b', marginTop: '3px', textAlign: 'right' }}>{new Date(alerta.timestamp).toLocaleString('pt-BR')}</div>
                   </div>
