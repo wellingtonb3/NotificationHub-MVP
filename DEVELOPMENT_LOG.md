@@ -92,3 +92,32 @@ Este documento descreve a arquitetura, os pré-requisitos e os passos para rodar
 ├── README.md              # Documentação principal da plataforma
 └── DEVELOPMENT_LOG.md     # Diário de bordo da evolução do MVP
 
+################# PARTE FINAL DE AJUSTES, TESTES, ETC
+
+
+
+Entendi perfeitamente! Você quer registrar a **evidência da nossa jornada de desenvolvimento**, compilando essa nossa interação passo a passo (os testes, as correções de regras no backend, a criação dos modais, o tratamento de dados inválidos e a montagem do layout final) para colar direto no seu **Diário de Bordo (`DEVELOPMENT_LOG.md`)**.
+
+Aqui está o texto pronto, em formato de relatório cronológico, detalhando tudo o que construímos e resolvemos juntos até chegarmos a este nível profissional:
+
+---
+
+### 📝 Diário de Bordo: Evolução e Refinamento do NotificationHub (MVP)
+
+#### 1. Correções de Backend e Validação de Regras
+
+* **Tratamento de Leituras Físicas Inválidas:** Implementação de barreiras no motor de regras do FastAPI para identificar leituras fisicamente impossíveis (ex: umidade acima de 100% ou abaixo de 0%), disparando automaticamente alertas de erro de sensor (`alerta_disparado = 1`) com mensagens descritivas de hardware.
+* **Limpeza e Ordenação de Base de Dados:** Padronização dos timestamps dos eventos para garantir que o fluxo de dados em tempo real e o histórico ordenado por cronologia apareçam corretamente no painel.
+
+#### 2. Refinamento e Layout do Front-End (React / Vite)
+
+* **Tradução Amigável de Dispositivos:** Mapeamento completo dos IDs técnicos (`sensor-soil-01`, `sensor-humidity-01`, etc.) para nomes intuitivos no painel do operador ("Umidade do Solo", "Umidade do Ar", etc.).
+* **Sistema de Modais em Destaque:** Implementação de janelas flutuantes interativas para as seções principais da barra lateral esquerda (**Clima**, **Sensores Ativos**, **Histórico de Leitura** e a **Central de Alertas Críticos**), dando um aspecto de sistema corporativo real.
+* **Módulos Futuros Indicados:** Inclusão de visualizadores para expansões futuras do MVP (Culturas, Irrigação, Pecuária, Estoque, Relatórios e Configurações) com indicação visual de status desativado ("Em breve").
+* **Identidade Visual Profissional:** Adição de elementos visuais no cabeçalho (como o avatar/foto da fazenda e widget de clima em tempo real integrado via Open-Meteo) alinhados às melhores práticas de UI/UX em monitoramento agrícola.
+
+#### 3. Testes Funcionais e Integração Contínua
+
+* Validação bem-sucedida das requisições via simulação de dados (`POST` / `GET`), confirmando a comunicação estável entre o front-end em React, a API REST em Python/FastAPI e o banco SQLite em ambiente de produção via Nginx.
+
+---

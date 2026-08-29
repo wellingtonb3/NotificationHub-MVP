@@ -1,4 +1,19 @@
+import os
 import sqlite3
+
+# Pega o diretório atual onde o arquivo database.py está localizado
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "banco.db")
+
+def conectar():
+    return sqlite3.connect(DB_PATH)
+
+def criar_banco_e_tabela():
+    conn = conectar()
+    cursor = conn.cursor()
+    # Seu código de criação de tabela...
+    conn.commit()
+    conn.close()
 
 # Nome do arquivo do banco de dados que será criado automaticamente
 NOME_BANCO = "historico_fazenda.db"

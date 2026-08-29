@@ -12,12 +12,14 @@ def iniciar_simulacao():
     
     try:
         # 1. Abre o arquivo JSON e carrega a lista de eventos
-        with open(ARQUIVO_DADOS, 'r') as arquivo:
+        with open(ARQUIVO_DADOS, 'r', encoding='utf-8') as arquivo:
             eventos = json.load(arquivo)
             
         # 2. Percorre cada evento na lista
         for evento in eventos:
-            print(f"📡 Enviando dados do sensor: {evento['deviceId']}...")
+            # CORRIGIDO: Usando 'device_id' conforme o padrão atualizado
+            device_id = evento.get('device_id') or evento.get('deviceId')
+            print(f"📡 Enviando dados do sensor: {device_id} (ID: {evento.get('event_id')})...")
             
             # 3. Envia o evento para a nossa API via POST
             resposta = requests.post(URL_API, json=evento)
@@ -25,19 +27,20 @@ def iniciar_simulacao():
             # 4. Verifica o que a API respondeu
             if resposta.status_code == 200:
                 dados_resposta = resposta.json()
-                if dados_resposta.get("alerta_disparado"):
-                    print(f"   🚨 ALERTA: {dados_resposta.get('notificacao')}")
-                else:
-                    print("   ✅ Status: Leitura normal. Tudo ok.")
+                print("    ✅ Sucesso: Evento processado e validado pelo NotificationHub.")
+            elif resposta.status_code == 400:
+                # Trata o bloqueio de duplicidade ou erro de validação graciosamente
+                detalhe = resposta.json().get("detail", "Erro desconhecido")
+                print(f"    ⚠️ Aviso da API: {detalhe}")
             else:
-                print(f"   ❌ Erro ao enviar: Código {resposta.status_code}")
+                print(f"    ❌ Erro ao enviar: Código {resposta.status_code} - {resposta.text}")
                 
             print("-" * 50)
             
             # Pausa de 2 segundos entre um envio e outro para simular tempo real
             time.sleep(2)
             
-        print("\n🏁 Simulação concluída com sucesso!")
+        print("\n🏁 Simulação concluída!")
         
     except FileNotFoundError:
         print(f"Erro: Arquivo '{ARQUIVO_DADOS}' não encontrado.")

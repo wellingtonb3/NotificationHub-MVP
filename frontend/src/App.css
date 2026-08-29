@@ -1,11 +1,126 @@
-body, html {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #0f172a;
+/* Correção global para evitar estouro de largura em qualquer tela */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-* {
-  box-sizing: border-box;
+/* Layout padrão para Computador (Desktop) */
+.app-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background-color: #0f172a;
+  color: #f8fafc;
+  font-family: Inter, sans-serif;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 240px;
+  background-color: #1e293b;
+  border-right: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease-in-out;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden; /* IMPEDE O CORTE LATERAL / SCROLL HORIZONTAL */
+  padding: 25px;
+  width: 100%;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+/* Ordem padrão das colunas no Desktop */
+.coluna-esquerda {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  order: 1;
+  min-width: 0; /* Impede que grids internos empurrem a tela */
+}
+
+.coluna-direita {
+  order: 2;
+  min-width: 0;
+}
+
+/* Botão de Hambúrguer - Escondido por padrão (Desktop) */
+.menu-toggle-btn {
+  display: none !important;
+  background: none;
+  border: none;
+  color: #38bdf8;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* RESPONSIVIDADE PARA CELULARES E TABLETS (Telas menores que 768px) */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+
+  .menu-toggle-btn {
+    display: block !important;
+  }
+
+  /* Sidebar flutuante no celular */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100%;
+    z-index: 1000;
+    transform: translateX(-100%);
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    padding: 12px; /* Padding menor no celular para aproveitar melhor o espaço */
+    height: 100vh;
+    overflow-x: hidden; /* Garante que nada vaze para fora */
+  }
+
+  /* Força o grid a respeitar 100% da largura da tela do celular */
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Alertas no topo ocupando exatamente a largura disponível */
+  .coluna-direita {
+    order: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .coluna-esquerda {
+    order: 2 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }

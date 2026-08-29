@@ -1,3 +1,5 @@
+Aqui está o seu **README.md** atualizado, padronizado e pronto para o GitHub, incorporando todas as novas evoluções visuais e funcionais (tradução amigável de sensores, modais de destaque, validação física no backend e módulos futuros) que construímos juntos:
+
 ```markdown
 # 🌾 NotificationHub - Fazenda Inteligente (MVP)
 
@@ -11,28 +13,36 @@ O sistema conta com um **Back-End** robusto em FastAPI, um **Banco de Dados** SQ
 
 ### **Back-End & Dados**
 * **Python / FastAPI:** Framework web de alta performance responsável pelas rotas e API REST.
-* **Pydantic:** Validação rigorosa dos dados de entrada (payload dos sensores).
-* **SQLite3:** Banco de dados relacional para armazenamento do histórico de eventos e alarmes.
+* **Pydantic:** Validação rigorosa dos dados de entrada (payload dos sensores) e barreiras físicas para rejeitar leituras inválidas.
+* **SQLite3:** Banco de dados relacional para armazenamento do histórico de eventos, alarmes e logs cronológicos.
 * **Uvicorn:** Servidor ASGI para execução da API.
 
 ### **Front-End & Infraestrutura**
-* **React / Vite:** Interface de usuário dinâmica, organizada em cards e painéis de controle.
+* **React / Vite:** Interface de usuário dinâmica, organizada em cards informativos, modais de destaque por seções e histórico em tempo real.
 * **Nginx:** Servidor web e proxy reverso (responsável por servir a build estática do Front-End em `/api-agro2/` e redirecionar a API do Back-End em `/api-agro/`).
 
 ---
 
 ## 📋 Regras de Negócio e os 6 Sensores Oficiais
 
-O sistema monitora e valida automaticamente os seguintes dispositivos de campo:
+O sistema monitora, valida automaticamente e traduz os IDs técnicos para nomenclaturas amigáveis dos seguintes dispositivos de campo:
 
 | Nome Amigável | `deviceId` (Técnico) | `type` | Unidade | Critério de Alerta / Comportamento |
 | :--- | :--- | :--- | :---: | :--- |
 | **Temperatura do Ar** | `sensor-temp-01` | `AIR_TEMPERATURE` | °C | Alerta crítico se ultrapassar os limites seguros de calor. |
-| **Umidade do Ar** | `sensor-humidity-01` | `AIR_HUMIDITY` | % | Alerta crítico se a umidade estiver criticamente baixa. |
+| **Umidade do Ar** | `sensor-humidity-01` | `AIR_HUMIDITY` | % | Alerta crítico se a umidade estiver criticamente baixa ou se houver erro físico. |
 | **Umidade do Solo** | `sensor-soil-01` | `SOIL_MOISTURE` | % | Dispara aviso de irrigação se o solo secar abaixo do limite. |
 | **Reservatório de Água** | `reservoir-sensor-01` | `WATER_RESERVOIR_LEVEL` | % | Alerta crítico de nível baixo de água para reabastecimento. |
 | **Silo de Grãos** | `silo-sensor-01` | `SILO_LEVEL` | % | Alerta se o armazenamento de grãos estiver esvaziando. |
 | **Bomba de Irrigação** | `irrigation-pump-01` | `EQUIPMENT_STATUS` | *N/A* | Status operacional (`FAILURE` dispara alarme de manutenção). |
+
+---
+
+## ✨ Principais Funcionalidades da Interface
+
+* **Central de Modais em Destaque:** Navegação lateral interativa que abre janelas flutuantes corporativas para **Clima** (integrado via Open-Meteo), **Sensores Ativos**, **Histórico de Leitura** e a **Central de Alertas Críticos**.
+* **Módulos Futuros:** Seções visuais na barra lateral indicando expansões planejadas (Culturas, Irrigação, Pecuária, Estoque, Relatórios e Configurações) com o status "Em breve".
+* **Identidade Visual Profissional:** Cabeçalho customizado com widget climático em tempo real e avatar/foto da fazenda.
 
 ---
 
@@ -83,8 +93,10 @@ npm run build
 
 * `main.py`: Ponto de entrada da API, contendo o Motor de Regras e rotas.
 * `database.py`: Gerenciador de conexão e queries do SQLite.
-* `simulador.py`: Script de automação via terminal para testes de carga.
+* `simulador.py`: Script de automação via terminal para testes de carga e injeção de falhas.
 * `frontend/`: Código fonte completo e arquivos de build da interface em React (Vite).
 * `DEVELOPMENT_LOG.md`: Diário de bordo detalhando arquitetura e uso de IA.
+
+```
 
 ```
