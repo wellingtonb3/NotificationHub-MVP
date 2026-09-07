@@ -197,7 +197,7 @@ def receber_evento(evento: EventoSchema):
                     alerta_disparado = 1
                     mensagem_notificacao = f"💧 Nível baixo de água: o reservatório está com apenas {val_num}% de sua capacidade."
                 
-                elif s_type == "SILO_LEVEL" and val_num < 12.0:
+                elif s_type == "SILO_LEVEL" and val_num < 15.0:
                     alerta_disparado = 1
                     mensagem_notificacao = f"⚠️ Nível baixo no silo: o silo monitorado por {d_id} está com {val_num}% de sua capacidade."
 
